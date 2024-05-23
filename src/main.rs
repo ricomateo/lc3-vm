@@ -1,10 +1,18 @@
 use crate::instructions::instructions::*;
 use crate::constants::constants::*;
+use crate::traps::traps::*;
 pub mod instructions;
 pub mod constants;
 pub mod utils;
+pub mod traps;
 
-
+fn trap_handler(instr: usize, reg: &mut [usize; R_COUNT]) {
+    reg[R_R7] = reg[R_PC];
+    match instr & 0xFF {
+        TRAP_GETC => println!("trap_getc"),
+        _ => println!("not implemented yet"),
+    }
+}
 
 
 fn start_vm() {   
@@ -30,6 +38,7 @@ fn start_vm() {
             OP_ADD => add(instr, &mut reg),
             //OP_LDI => ldi(instr, reg, memory),
             OP_AND => and(instr, &mut reg),
+            OP_TRAP => trap_handler(instr, &mut reg),
             _ => println!("not implemented yet"),
         }
     }

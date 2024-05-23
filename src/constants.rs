@@ -34,7 +34,7 @@ pub mod constants {
     // pub OP_JMP,    /* jump */
     // pub OP_RES,    /* reserved (unused) */
     // pub OP_LEA,    /* load effective address */
-    // pub OP_TRAP    /* execute trap */
+    pub const OP_TRAP: usize = 15;    /* execute trap */
 
 
 
@@ -43,5 +43,12 @@ pub mod constants {
     pub const FL_POS: usize = 1 << 0; /* P */
     pub const FL_ZRO: usize = 1 << 1; /* Z */
     pub const FL_NEG: usize = 1 << 2; /* N */
+
+    pub const TRAP_GETC: usize = 0x20;  /* get character from keyboard, not echoed onto the terminal */
+    pub const TRAP_OUT: usize = 0x21;   /* output a character */
+    pub const TRAP_PUTS: usize = 0x22;  /* output a word string */
+    pub const TRAP_IN: usize = 0x23;    /* get character from keyboard, echoed onto the terminal */
+    pub const TRAP_PUTSP: usize = 0x24; /* output a byte string */
+    pub const TRAP_HALT: usize = 0x25;   /* halt the program */
 
 }
