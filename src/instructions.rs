@@ -22,7 +22,7 @@ pub mod instructions {
         update_flags(r0, &mut reg);
     }
     
-    pub fn ldi(instr: usize, mut reg: &mut [usize; R_COUNT], memory: [usize; MEMORY_MAX]) {
+    pub fn ldi(instr: usize, mut reg: &mut [usize; R_COUNT], memory: &[usize; MEMORY_MAX]) {
         /* destination register (DR) */
         let r0: usize = (instr >> 9) & 0x7;
         /* PCoffset 9*/
@@ -67,6 +67,25 @@ mod tests {
         add(instr, &mut reg);
         // after executing the instruction, r3 = 4
         assert_eq!(reg[R_R3], 4);
+    }
+
+    #[test]
+    /// This test sets the 1st memory position to 2,
+    /// where 2 is the address of the memory position that holds
+    /// the value we want to load into a register.
+    /// Then executes ldi to load that value (the stored in memory[2])
+    fn ldi_works_correctly() {
+        let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+        // instr = b1010001000000001 = 0xA201
+        let instr: usize = 0xA201;
+        let mut memory: [usize; MEMORY_MAX] = [0; MEMORY_MAX];
+        // memory[1] holds the address of the value
+        memory[1] = 2;
+        // memory[2] holds the value 64
+        memory[2] = 64;
+        assert_eq!(reg[R_R1], 0);
+        ldi(instr, &mut reg, &memory);
+        assert_eq!(reg[R_R1], 64);
     }
 
     #[test]
