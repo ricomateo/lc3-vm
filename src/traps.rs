@@ -34,6 +34,14 @@ pub mod traps {
     pub fn output_character(reg: &mut [usize; R_COUNT]) {
         print!("{}", (reg[R_R0] as u8) as char);
     }
+
+    pub fn input_character(reg: &mut [usize; R_COUNT]) {
+        println!("Enter a character: ");
+        let c: char = get_char();
+        print!("{c}");
+        reg[R_R0] = c as usize;
+        update_flags(R_R0, reg);
+    }
 }
 
 
