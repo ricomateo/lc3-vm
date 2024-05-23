@@ -91,6 +91,16 @@ pub mod instructions {
         reg[r0] = memory[reg[R_PC] + pc_offset];
         update_flags(r0, reg);
     }
+
+    /// Computes an address by calculating address = base register + offset6
+    /// and then loads the value contained in that address into a register
+    pub fn ldr(instr: usize, reg: &mut [usize; R_COUNT], memory: &[usize; MEMORY_MAX]) {
+        let r0: usize = (instr >> 9) & 0x7;
+        let r1: usize = (instr >> 6) & 0x7;
+        let offset: usize = sign_extend(instr & 0x3F, 6);
+        reg[r0] = memory[reg[r1] + offset];
+        update_flags(r0, reg);
+    }
 }
 
 
@@ -221,6 +231,24 @@ mod tests {
         assert_eq!(reg[R_R1], 0);
         ld(instr, &mut reg, &mut memory);
         assert_eq!(reg[R_R1], value)
+    }
+    #[test]
+    /// Loads the value contained at the address
+    /// contained at the address base + offset to the
+    /// register r2
+    fn ldr_works_correctly() {
+        let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+        let mut memory: [usize; MEMORY_MAX] = [0; MEMORY_MAX];
+        let offset: usize = 8;
+        let base: usize = 8;
+        let value: usize = 32;
+        reg[R_R1] = base;
+        memory[base + offset] = value;
+        // instr = b0110010001001000 = 0x6448
+        let instr: usize = 0x6448;
+        assert_eq!(reg[R_R2], 0);
+        ldr(instr, &mut reg, &mut memory);
+        assert_eq!(reg[R_R2], value);
     }
 }
 
