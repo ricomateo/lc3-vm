@@ -1,11 +1,5 @@
 
-//pub mod constants;
-//use crate::utils::utils::*;
-//pub mod crate::utils::utils;
-//pub mod utils;
-
 pub mod instructions {
-    //use utils::*;
     use crate::constants::constants::*;
     use crate::utils::utils::*;
     pub fn add(instr: usize, mut reg: &mut [usize; R_COUNT]) {
@@ -43,7 +37,7 @@ pub mod instructions {
         let r1: usize = (instr >> 6) & 0x7;
         let imm_flag: usize = (instr >> 5) & 0x1;
 
-        if (imm_flag == 1) {
+        if imm_flag == 1 {
             let imm5: usize = sign_extend(instr & 0x1F, 5);
             reg[r0] = reg[r1] & imm5;
         } else {

@@ -17,11 +17,11 @@ fn start_vm() {
 
     /* set the PC to starting position */
     /* 0x3000 is the default */
-    let PC_START = 0x3000;
-    reg[R_PC] = PC_START;
+    let pc_start = 0x3000;
+    reg[R_PC] = pc_start;
 
     let running = 1;
-    while (running == 1) {
+    while running == 1 {
         /* FETCH */
         let instr: usize = memory[reg[R_PC] + 1];
         let op: usize = instr >> 12;
