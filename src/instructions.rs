@@ -118,6 +118,15 @@ pub mod instructions {
         let pc_offset: usize = sign_extend(instr & 0x1FF, 9);
         memory[reg[R_PC] + pc_offset] = reg[r0];
     }
+    
+    /// Computes a memory address by adding pc + offset. This address
+    /// contains the address where the value given by a register is
+    /// going to be stored in
+    pub fn store_indirect(instr: usize, reg: &mut [usize; R_COUNT], memory: &mut [usize; MEMORY_MAX]) {
+        let r0: usize = (instr >> 9) & 0x7;
+        let pc_offset: usize = sign_extend(instr & 0x1FF, 9);
+        memory[memory[reg[R_PC] + pc_offset]] = reg[r0];
+    }
 }
 
 
@@ -297,6 +306,24 @@ mod tests {
         let address = reg[R_PC] + pc_offset;
         assert_eq!(memory[address], 0);
         store(instr, &mut reg, &mut memory);
+        assert_eq!(memory[address], reg[R_R1]);
+    }
+
+    #[test]
+    /// memory[pc + pc_offset] contains the address where
+    /// the value is stored. The value is specified by the register r1.
+    fn store_indirect_works_correctly() {
+        let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+        let mut memory: [usize; MEMORY_MAX] = [0; MEMORY_MAX];
+        let value = 16;
+        reg[R_R1] = value;
+        let address = 64;
+        let pc_offset = 4;
+        memory[reg[R_PC] + pc_offset] = address;
+        // instr = b1011001000000100 = 0xB204
+        let instr: usize = 0xB204;
+        assert_eq!(memory[address], 0);
+        store_indirect(instr, &mut reg, &mut memory);
         assert_eq!(memory[address], reg[R_R1]);
     }
 }
