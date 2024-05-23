@@ -16,4 +16,11 @@ pub mod utils {
             reg[R_COND] = FL_POS;
         }
     }
+
+    pub fn get_char() -> char {
+        use console::Term;
+        let term = Term::stdout();
+        let char = term.read_char().expect("error while reading char");
+        char
+    }
 }
