@@ -54,6 +54,15 @@ pub mod instructions {
         reg[r0] = !reg[r1];
         update_flags(r0, &mut reg);
     }
+
+    pub fn branch(instr: usize, mut reg: &mut [usize; R_COUNT]) {
+        let pc_offset: usize = sign_extend(instr & 0x1FF, 9);
+        let cond_flag: usize = (instr >> 9) & 0x7;
+        if cond_flag & reg[R_COND] > 0 {
+            reg[R_PC] += pc_offset;
+        }
+    }
+
 }
 
 #[cfg(test)]
@@ -122,6 +131,18 @@ mod tests {
         not(instr, &mut reg);
         // the &0xffff is needed because reg contains usize, not u16
         assert_eq!(reg[R_R2] &0xffff, 65535);
+    }
+
+    #[test]
+    /// Branch 16 memory positions if flag = positive
+    fn branch_works_correctly() {
+        let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+        // instr = b0000001000010000 = 0x210
+        let instr: usize = 0x210;
+        reg[R_COND] = FL_POS;
+        assert_eq!(reg[R_PC], 0);
+        branch(instr, &mut reg);
+        assert_eq!(reg[R_PC], 16);
     }
 
 }
