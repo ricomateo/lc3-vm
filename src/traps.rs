@@ -29,6 +29,11 @@ pub mod traps {
         reg[R_R0] = char;
         update_flags(R_R0, reg);
     }
+
+    /// Prints the character stored in r0 register.
+    pub fn output_character(reg: &mut [usize; R_COUNT]) {
+        print!("{}", (reg[R_R0] as u8) as char);
+    }
 }
 
 
