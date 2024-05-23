@@ -24,7 +24,7 @@ pub mod constants {
     // pub OP_LD,     /* load */
     // pub OP_ST,     /* store */
     // pub OP_JSR,    /* jump register */
-    // pub OP_AND,    /* bitwise and */
+    pub const OP_AND: usize = 5;  /* bitwise and */
     // pub OP_LDR,    /* load register */
     // pub OP_STR,    /* store register */
     // pub OP_RTI,    /* unused */

@@ -29,11 +29,12 @@ fn start_vm() {
         match op {
             OP_ADD => add(instr, reg),
             OP_LDI => ldi(instr, reg, memory),
+            OP_AND => and(instr, reg),
             _ => println!("not implemented yet"),
         }
     }
 }
 
 fn main() {
-    
+    start_vm();
 }
