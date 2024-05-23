@@ -127,6 +127,15 @@ pub mod instructions {
         let pc_offset: usize = sign_extend(instr & 0x1FF, 9);
         memory[memory[reg[R_PC] + pc_offset]] = reg[r0];
     }
+
+    /// Computes a memory address by adding base register + offset 6.
+    /// The value specified by the register SR is stored in the computed address.
+    pub fn store_register(instr: usize, reg: &mut [usize; R_COUNT], memory: &mut [usize; MEMORY_MAX]) {
+        let r0: usize = (instr >> 9) & 0x7;
+        let r1: usize = (instr >> 6) & 0x7;
+        let offset: usize = sign_extend(instr & 0x3F, 6);
+        memory[reg[r1] + offset] = reg[r0];
+    }
 }
 
 
@@ -325,6 +334,24 @@ mod tests {
         assert_eq!(memory[address], 0);
         store_indirect(instr, &mut reg, &mut memory);
         assert_eq!(memory[address], reg[R_R1]);
+    }
+
+
+    #[test]
+    /// stores the value specified by the register r1 (16) in the
+    /// address r2 + offset = 4 + 4 = 8
+    fn store_register_works_correctly() {
+        let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+        let mut memory: [usize; MEMORY_MAX] = [0; MEMORY_MAX];
+        let value = 16;
+        reg[R_R1] = value;
+        reg[R_R2] = 4;
+        let offset: usize = 4;
+        // instr = 0111 001 010 000100 = 0x7284
+        let instr: usize = 0x7284;
+        assert_eq!(memory[reg[R_R2] + offset], 0);
+        store_register(instr, &mut reg, &mut memory);
+        assert_eq!(memory[reg[R_R2] + offset], value);
     }
 }
 
