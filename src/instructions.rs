@@ -63,7 +63,17 @@ pub mod instructions {
         }
     }
 
+    pub fn jump(instr: usize, mut reg: &mut [usize; R_COUNT]) {
+        let r1: usize = (instr >> 6) & 0x7;
+        reg[R_PC] = reg[r1];
+    }
+
+
 }
+
+
+
+
 
 #[cfg(test)]
 mod tests {
@@ -142,6 +152,19 @@ mod tests {
         reg[R_COND] = FL_POS;
         assert_eq!(reg[R_PC], 0);
         branch(instr, &mut reg);
+        assert_eq!(reg[R_PC], 16);
+    }
+
+    #[test]
+    /// Jumps to the position indicated by the register r1
+    /// i.e,  pc = r1
+    fn jump_works_correctly() {
+        let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+        // instr = b1100000001000000 = 0xC040
+        let instr: usize = 0xC040;
+        reg[R_R1] = 16;
+        assert_eq!(reg[R_PC], 0);
+        jump(instr, &mut reg);
         assert_eq!(reg[R_PC], 16);
     }
 
