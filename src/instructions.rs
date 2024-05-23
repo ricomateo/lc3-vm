@@ -110,6 +110,14 @@ pub mod instructions {
         reg[r0] = reg[R_PC] + pc_offset;
         update_flags(r0, reg);
     }
+
+    /// Computes a memory address by adding PC and PCoffset9, and then 
+    /// stores the value contained in a register in that memory address
+    pub fn store(instr: usize, reg: &mut [usize; R_COUNT], memory: &mut [usize; MEMORY_MAX]) {
+        let r0: usize = (instr >> 9) & 0x7;
+        let pc_offset: usize = sign_extend(instr & 0x1FF, 9);
+        memory[reg[R_PC] + pc_offset] = reg[r0];
+    }
 }
 
 
@@ -272,7 +280,24 @@ mod tests {
         let instr: usize = 0xE202;
         assert_eq!(reg[R_R1], 0);
         lea(instr, &mut reg);
-        assert_eq!(reg[R_R1], 4);c
+        assert_eq!(reg[R_R1], 4);
+    }
+
+
+    #[test]
+    /// Stores the value contained by r1 (16) in the
+    /// address given by pc + pc_offset = 4
+    fn store_works_correctly() {
+        let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+        let mut memory: [usize; MEMORY_MAX] = [0; MEMORY_MAX];
+        reg[R_R1] = 16;
+        let pc_offset: usize = 4;
+        // instr = b0110001000000100 = 0x6204;
+        let instr: usize = 0x6204;
+        let address = reg[R_PC] + pc_offset;
+        assert_eq!(memory[address], 0);
+        store(instr, &mut reg, &mut memory);
+        assert_eq!(memory[address], reg[R_R1]);
     }
 }
 
