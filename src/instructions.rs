@@ -101,6 +101,15 @@ pub mod instructions {
         reg[r0] = memory[reg[r1] + offset];
         update_flags(r0, reg);
     }
+
+    /// Computes an address by adding PC and PCoffset9, and loading it
+    /// into a given register
+    pub fn lea(instr: usize, reg: &mut [usize; R_COUNT]) {
+        let r0: usize = (instr >> 9) & 0x7;
+        let pc_offset: usize = sign_extend(instr & 0x1FF, 9);
+        reg[r0] = reg[R_PC] + pc_offset;
+        update_flags(r0, reg);
+    }
 }
 
 
@@ -249,6 +258,21 @@ mod tests {
         assert_eq!(reg[R_R2], 0);
         ldr(instr, &mut reg, &mut memory);
         assert_eq!(reg[R_R2], value);
+    }
+
+    #[test]
+    /// Initialize PC = 2, and then load the value
+    /// PC + offset = 2 + 2 = 4 onto the r1 register
+    fn lea_works_correctly() {
+        let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+        let pc_offset = 2;
+        let pc = 2;
+        reg[R_PC] = pc;
+        // instr = b1110001000000010 = 0xE202
+        let instr: usize = 0xE202;
+        assert_eq!(reg[R_R1], 0);
+        lea(instr, &mut reg);
+        assert_eq!(reg[R_R1], 4);c
     }
 }
 
