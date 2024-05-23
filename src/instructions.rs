@@ -68,6 +68,20 @@ pub mod instructions {
         reg[R_PC] = reg[r1];
     }
 
+    /// saves the PC value onto the r7 register, and then jumps
+    /// to the value given on the PCoffset11 field or the one
+    /// contained in the register given by BaseR
+    pub fn jump_register(instr: usize, reg: &mut [usize; R_COUNT]) {
+        let long_flag: usize = (instr >> 11) & 1;
+        reg[R_R7] = reg[R_PC];
+        if long_flag > 0 {
+            let long_pc_offset: usize = sign_extend(instr & 0x7FF, 11);
+            reg[R_PC] += long_pc_offset;  /* JSR */
+        } else {
+            let r1: usize = (instr >> 6) & 0x7;
+            reg[R_PC] = reg[r1]; /* JSRR */
+        }
+    }
 
 }
 
@@ -168,6 +182,22 @@ mod tests {
         assert_eq!(reg[R_PC], 16);
     }
 
+
+    #[test]
+    /// The pc register starts on 8. 
+    /// After the execution of jump_register it should be incremented
+    /// by 4 so pc = 12 and the previous value should have been saved
+    /// on register r7, so r7 = 8.
+    fn jump_register_works_correctly() {
+        let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+        // instr = b0100100000000100 = 0x4801
+        let instr: usize = 0x4804;
+        reg[R_PC] = 8;
+        assert_eq!(reg[R_R7], 0);
+        jump_register(instr, &mut reg);
+        assert_eq!(reg[R_PC], 12);
+        assert_eq!(reg[R_R7], 8);
+    }
 }
 
 
