@@ -7,7 +7,7 @@ pub mod utils {
         x
     }
     
-    pub fn update_flags(r: usize, mut reg: [usize; R_COUNT]) {
+    pub fn update_flags(r: usize, reg: &mut [usize; R_COUNT]) {
         if reg[r] == 0 {
             reg[R_COND] = FL_ZRO;
         } else if reg[r] >> 15 == 1 /* a 1 in the left-most bit indicates negative */{

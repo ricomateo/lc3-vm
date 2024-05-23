@@ -27,9 +27,9 @@ fn start_vm() {
         let op: usize = instr >> 12;
 
         match op {
-            OP_ADD => add(instr, reg),
-            OP_LDI => ldi(instr, reg, memory),
-            OP_AND => and(instr, reg),
+            OP_ADD => add(instr, &mut reg),
+            //OP_LDI => ldi(instr, reg, memory),
+            OP_AND => and(instr, &mut reg),
             _ => println!("not implemented yet"),
         }
     }
