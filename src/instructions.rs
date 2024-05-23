@@ -83,6 +83,14 @@ pub mod instructions {
         }
     }
 
+    /// Loads onto a register the value contained in the address
+    /// PC + PCoffset9
+    pub fn ld(instr: usize, reg: &mut [usize; R_COUNT], memory: &[usize; MEMORY_MAX]) {
+        let r0: usize = (instr >> 9) & 0x7;
+        let pc_offset: usize = sign_extend(instr & 0x1FF, 9);
+        reg[r0] = memory[reg[R_PC] + pc_offset];
+        update_flags(r0, reg);
+    }
 }
 
 
@@ -197,6 +205,22 @@ mod tests {
         jump_register(instr, &mut reg);
         assert_eq!(reg[R_PC], 12);
         assert_eq!(reg[R_R7], 8);
+    }
+
+    #[test]
+    /// Sets the 16th memory position to the value 32.
+    /// Then loads that value to the r1 register.
+    fn ld_works_correctly() {
+        let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+        let mut memory: [usize; MEMORY_MAX] = [0; MEMORY_MAX];
+        let offset: usize = 16;
+        let value: usize = 32;
+        memory[offset] = value;
+        // instr = b0010001000010000 = 0x2210
+        let instr: usize = 0x2210;
+        assert_eq!(reg[R_R1], 0);
+        ld(instr, &mut reg, &mut memory);
+        assert_eq!(reg[R_R1], value)
     }
 }
 
