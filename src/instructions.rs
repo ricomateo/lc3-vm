@@ -46,6 +46,14 @@ pub mod instructions {
         }
         update_flags(r0, &mut reg);
     }
+
+    pub fn not(instr: usize, mut reg: &mut [usize; R_COUNT]) {
+        let r0: usize = (instr >> 9) & 0x7;
+        let r1: usize = (instr >> 6) & 0x7;
+
+        reg[r0] = !reg[r1];
+        update_flags(r0, &mut reg);
+    }
 }
 
 #[cfg(test)]
@@ -102,6 +110,18 @@ mod tests {
         and(instr, &mut reg);
         // after executing the instruction, r3 = 4
         assert_eq!(reg[R_R3], 1);
+    }
+
+    #[test]
+    /// This test executes r2 = NOT r1
+    fn not_works_correctly() {
+        let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+        // instr = b1001010001111111 = 0x947F
+        let instr: usize = 0x947F;
+        assert_eq!(reg[R_R2], 0);
+        not(instr, &mut reg);
+        // the &0xffff is needed because reg contains usize, not u16
+        assert_eq!(reg[R_R2] &0xffff, 65535);
     }
 
 }
