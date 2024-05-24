@@ -4,7 +4,7 @@ use crate::constants::*;
 use crate::utils::*;
 
 pub fn add(instr: u16, mut reg: &mut [u16; R_COUNT]) {
-    println!("add");
+    //println!("add");
     /* destination register (DR) */
     let r0: u16 = (instr >> 9) & 0x7;
     /* first operand (SR1) */
@@ -24,7 +24,7 @@ pub fn add(instr: u16, mut reg: &mut [u16; R_COUNT]) {
 }
 
 pub fn ldi(instr: u16, mut reg: &mut [u16; R_COUNT], memory: &[u16; MEMORY_MAX]) {
-    println!("ldi");
+    //println!("ldi");
     /* destination register (DR) */
     let r0: u16 = (instr >> 9) & 0x7;
     /* PCoffset 9*/
@@ -35,7 +35,7 @@ pub fn ldi(instr: u16, mut reg: &mut [u16; R_COUNT], memory: &[u16; MEMORY_MAX])
 }
 
 pub fn and(instr: u16, mut reg: &mut [u16; R_COUNT]) {
-    println!("and");
+    //println!("and");
     let r0: u16 = (instr >> 9) & 0x7;
     let r1: u16 = (instr >> 6) & 0x7;
     let imm_flag: u16 = (instr >> 5) & 0x1;
@@ -51,7 +51,7 @@ pub fn and(instr: u16, mut reg: &mut [u16; R_COUNT]) {
 }
 
 pub fn not(instr: u16, mut reg: &mut [u16; R_COUNT]) {
-    println!("not!");
+    //println!("not!");
     let r0: u16 = (instr >> 9) & 0x7;
     let r1: u16 = (instr >> 6) & 0x7;
 
@@ -63,9 +63,7 @@ pub fn branch(instr: u16, mut reg: &mut [u16; R_COUNT]) {
     
     let pc_offset: u16 = sign_extend(instr & 0x1FF, 9) as u16 as u16;
     let cond_flag: u16 = (instr >> 9) & 0x7;
-    if instr != 0 {
-        println!("branch from {} to {}", reg[R_PC], reg[R_PC] + pc_offset);
-    }
+    
     if cond_flag & reg[R_COND] > 0 {
         reg[R_PC] += pc_offset;
     }
@@ -81,7 +79,7 @@ pub fn jump(instr: u16, mut reg: &mut [u16; R_COUNT]) {
 /// to the value given on the PCoffset11 field or the one
 /// contained in the register given by BaseR
 pub fn jump_register(instr: u16, reg: &mut [u16; R_COUNT]) {
-    println!("jump register");
+    //println!("jump register");
     let long_flag: u16 = (instr >> 11) & 1;
     reg[R_R7] = reg[R_PC];
     if long_flag > 0 {
@@ -96,7 +94,7 @@ pub fn jump_register(instr: u16, reg: &mut [u16; R_COUNT]) {
 /// Loads onto a register the value contained in the address
 /// PC + PCoffset9
 pub fn ld(instr: u16, reg: &mut [u16; R_COUNT], memory: &[u16; MEMORY_MAX]) {
-    println!("ld");
+    //println!("ld");
     let r0: u16 = (instr >> 9) & 0x7;
     let pc_offset: u16 = sign_extend(instr & 0x1FF, 9);
     reg[r0 as usize] = memory[reg[R_PC] as usize + pc_offset as usize];
@@ -106,7 +104,7 @@ pub fn ld(instr: u16, reg: &mut [u16; R_COUNT], memory: &[u16; MEMORY_MAX]) {
 /// Computes an address by calculating address = base register + offset6
 /// and then loads the value contained in that address into a register
 pub fn ldr(instr: u16, reg: &mut [u16; R_COUNT], memory: &[u16; MEMORY_MAX]) {
-    println!("ldr");
+    //println!("ldr");
     let r0: u16 = (instr >> 9) & 0x7;
     let r1: u16 = (instr >> 6) & 0x7;
     let offset: u16 = sign_extend(instr & 0x3F, 6);
@@ -117,7 +115,7 @@ pub fn ldr(instr: u16, reg: &mut [u16; R_COUNT], memory: &[u16; MEMORY_MAX]) {
 /// Computes an address by adding PC and PCoffset9, and loading it
 /// into a given register
 pub fn lea(instr: u16, reg: &mut [u16; R_COUNT]) {
-    println!("lea");
+    //println!("lea");
     let r0: u16 = (instr >> 9) & 0x7;
     let pc_offset: u16 = sign_extend(instr & 0x1FF, 9);
     reg[r0 as usize] = reg[R_PC] + pc_offset;
@@ -127,7 +125,7 @@ pub fn lea(instr: u16, reg: &mut [u16; R_COUNT]) {
 /// Computes a memory address by adding PC and PCoffset9, and then 
 /// stores the value contained in a register in that memory address
 pub fn store(instr: u16, reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX]) {
-    println!("store");
+    //println!("store");
     let r0: u16 = (instr >> 9) & 0x7;
     let pc_offset: u16 = sign_extend(instr & 0x1FF, 9);
     memory[(reg[R_PC] + pc_offset) as usize] = reg[r0 as usize];
@@ -137,7 +135,7 @@ pub fn store(instr: u16, reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX
 /// contains the address where the value given by a register is
 /// going to be stored in
 pub fn store_indirect(instr: u16, reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX]) {
-    println!("store indirect");
+    //println!("store indirect");
     let r0: u16 = (instr >> 9) & 0x7;
     let pc_offset: u16 = sign_extend(instr & 0x1FF, 9);
     memory[memory[(reg[R_PC] + pc_offset) as usize] as usize] = reg[r0 as usize];
@@ -146,19 +144,14 @@ pub fn store_indirect(instr: u16, reg: &mut [u16; R_COUNT], memory: &mut [u16; M
 /// Computes a memory address by adding base register + offset 6.
 /// The value specified by the register SR is stored in the computed address.
 pub fn store_register(instr: u16, reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX]) {
-    println!("store register");
+    //println!("store register");
     let r0: u16 = (instr >> 9) & 0x7;
     let r1: u16 = (instr >> 6) & 0x7;
     let offset: u16 = sign_extend(instr & 0x3F, 6) as u16 as u16;
-    println!("reg[r1] = {:X}", reg[r1 as usize]);
-    println!("offset = {:X}", offset);
+    //println!("reg[r1] = {:X}", reg[r1 as usize]);
+    //println!("offset = {:X}", offset);
     let index = reg[r1 as usize] + offset;
-    if index as usize >= MEMORY_MAX {
-        println!("-----\ninstruction = {:X}\n-----\n", instr);
-        println!("index >= memory_max");
-        println!("reg[r1] = {:X}, reg[r1] as u16 = {:X}", reg[r1 as usize], reg[r1 as usize] as u16);
-        println!("offset = {:X}, offset as u16 = {:X}", offset, offset as u16);
-    }
+    
     memory[(reg[r1 as usize] + offset) as usize] = reg[r0 as usize];
 }
 

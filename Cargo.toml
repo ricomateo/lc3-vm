@@ -7,3 +7,5 @@ edition = "2021"
 console = "0.15"
 byteorder = "1.2.7"
 
+[profile.dev]
+overflow-checks = false

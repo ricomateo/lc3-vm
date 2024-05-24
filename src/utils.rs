@@ -38,7 +38,7 @@ pub fn read_image_file(file: &mut File, memory: &mut [u16; MEMORY_MAX]) {
     loop {
         match rdr.read_u16::<BigEndian>() {
             Ok(instruction) => {
-                println!("instruction = {:X}", instruction);
+                //println!("instruction = {:X}", instruction);
                 memory[address as usize] = instruction as u16;
                 address += 1;
             }

@@ -43,11 +43,14 @@ fn start_vm() {
     }
 
     let mut running = 1;
+    let mut i = 0;
     while running == 1 {
         /* FETCH */
-        reg[R_PC] += 1;
+        //reg[R_PC] += 1;
         let instr: u16 = memory[reg[R_PC] as usize];
         let op: u16 = instr >> 12;
+        reg[R_PC] += 1;
+        i+=1;
         match op {
             OP_ADD => add(instr, &mut reg),
             OP_LDI => ldi(instr, &mut reg, &memory),
