@@ -1,91 +1,91 @@
-pub mod traps {
-    use crate::constants::constants::*;
-    use crate::utils::utils::*;
 
-    pub fn puts(reg: &mut [usize; R_COUNT], memory: &mut [usize; MEMORY_MAX]) { //-> Vec<char> {
-        let mut address = reg[R_R0];
-        let mut c: usize = memory[address] as usize;
-        let mut chars: Vec<char> = Vec::new();
-        while c != 0 {
-            c = memory[address];
-            if c >> 16 > 0 {
-                println!("invalid character (non utf16)");
-                break;
-            }
-            let char = char::from_u32(c as u32).expect("invalid char conversion");
-            chars.push(char);
-            address += 1;
+use crate::constants::*;
+use crate::utils::*;
+
+pub fn puts(reg: &mut [usize; R_COUNT], memory: &mut [usize; MEMORY_MAX]) { //-> Vec<char> {
+    let mut address = reg[R_R0];
+    let mut c: usize = memory[address] as usize;
+    let mut chars: Vec<char> = Vec::new();
+    while c != 0 {
+        c = memory[address];
+        if c >> 16 > 0 {
+            println!("invalid character (non utf16)");
+            break;
         }
-        chars.iter().for_each(|c| {
-            print!("{}", c);
-        });
-        // remove the \0
-        //chars.remove(chars.len() - 1);
-        //chars
+        let char = char::from_u32(c as u32).expect("invalid char conversion");
+        chars.push(char);
+        address += 1;
     }
-
-    pub fn getc(reg: &mut [usize; R_COUNT]) {
-        let char: usize = (get_char() as usize) << 16 >> 16;
-        reg[R_R0] = char;
-        update_flags(R_R0, reg);
-    }
-
-    /// Prints the character stored in r0 register.
-    pub fn output_character(reg: &mut [usize; R_COUNT]) {
-        print!("{}", (reg[R_R0] as u8) as char);
-    }
-
-    pub fn input_character(reg: &mut [usize; R_COUNT]) {
-        println!("Enter a character: ");
-        let c: char = get_char();
-        print!("{c}");
-        reg[R_R0] = c as usize;
-        update_flags(R_R0, reg);
-    }
-
-    pub fn putsp(reg: &mut [usize; R_COUNT], memory: &mut [usize; MEMORY_MAX]) {//-> Vec<char> {
-        /* one char per byte (two bytes per word)
-            here we need to swap back to
-            big endian format */
-        let mut address = reg[R_R0];
-        let mut c: usize = memory[address];
-        let mut chars: Vec<char> = Vec::new();
-        while c as u8 != 0 {
-            c = memory[address];
-            let char1: usize = (c) & 0xFF;
-            if char1 == 0 {
-                break;
-            }
-            let char1 = char::from_u32(char1 as u32).expect("error while converting char");
-            chars.push(char1);
-            print!("{}", char1);
-            let char2: usize = (c) >> 8;
-            if char2 as u8 != 0 {
-                let char2 = char::from_u32(char2 as u32).expect("error while converting char");
-                print!("{}",char2);
-                chars.push(char2);
-                address += 1;
-                c = memory[address];
-            } else {
-                break;
-            }
-        }
-        //chars
-    }
-
-
-    pub fn halt(running: &mut usize) {
-        println!("HALT");
-        *running = 0;
-    }
+    chars.iter().for_each(|c| {
+        print!("{}", c);
+    });
+    // remove the \0
+    //chars.remove(chars.len() - 1);
+    //chars
 }
+
+pub fn getc(reg: &mut [usize; R_COUNT]) {
+    let char: usize = (get_char() as usize) << 16 >> 16;
+    reg[R_R0] = char;
+    update_flags(R_R0, reg);
+}
+
+/// Prints the character stored in r0 register.
+pub fn output_character(reg: &mut [usize; R_COUNT]) {
+    print!("{}", (reg[R_R0] as u8) as char);
+}
+
+pub fn input_character(reg: &mut [usize; R_COUNT]) {
+    println!("Enter a character: ");
+    let c: char = get_char();
+    print!("{c}");
+    reg[R_R0] = c as usize;
+    update_flags(R_R0, reg);
+}
+
+pub fn putsp(reg: &mut [usize; R_COUNT], memory: &mut [usize; MEMORY_MAX]) {//-> Vec<char> {
+    /* one char per byte (two bytes per word)
+        here we need to swap back to
+        big endian format */
+    let mut address = reg[R_R0];
+    let mut c: usize = memory[address];
+    let mut chars: Vec<char> = Vec::new();
+    while c as u8 != 0 {
+        c = memory[address];
+        let char1: usize = (c) & 0xFF;
+        if char1 == 0 {
+            break;
+        }
+        let char1 = char::from_u32(char1 as u32).expect("error while converting char");
+        chars.push(char1);
+        print!("{}", char1);
+        let char2: usize = (c) >> 8;
+        if char2 as u8 != 0 {
+            let char2 = char::from_u32(char2 as u32).expect("error while converting char");
+            print!("{}",char2);
+            chars.push(char2);
+            address += 1;
+            c = memory[address];
+        } else {
+            break;
+        }
+    }
+    //chars
+}
+
+
+pub fn halt(running: &mut usize) {
+    println!("HALT");
+    *running = 0;
+}
+
 
 
 
 #[cfg(test)]
 mod tests {
-    use crate::constants::constants::*;
-    use super::traps::*;
+    use crate::constants::*;
+    use super::*;
     #[test]
     /// This test sets r1 = 2, r2 = 2 and then
     /// executes r3 = r1 + r2
@@ -111,7 +111,7 @@ mod tests {
         getc(&mut reg);
         assert_ne!(reg[R_R0], 0);
     }
-    
+
 
     #[test]
     fn putsp_works_correctly() {

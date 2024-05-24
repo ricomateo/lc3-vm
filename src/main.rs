@@ -1,10 +1,10 @@
 use std::mem;
 
-use utils::utils::read_image;
+use utils::read_image;
 
-use crate::instructions::instructions::*;
-use crate::constants::constants::*;
-use crate::traps::traps::*;
+use crate::instructions::*;
+use crate::constants::*;
+use crate::traps::*;
 pub mod instructions;
 pub mod constants;
 pub mod utils;
