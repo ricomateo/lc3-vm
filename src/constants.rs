@@ -21,19 +21,19 @@ pub mod constants {
 
     pub const OP_BR: usize = 0; /* branch */
     pub const OP_ADD: usize = 1;    /* add  */
-    // pub OP_LD,     /* load */
-    // pub OP_ST,     /* store */
-    // pub OP_JSR,    /* jump register */
+    pub const OP_LD: usize =  2;     /* load */
+    pub const OP_ST: usize =  3;     /* store */
+    pub const OP_JSR: usize =  4;    /* jump register */
     pub const OP_AND: usize = 5;  /* bitwise and */
-    // pub OP_LDR,    /* load register */
-    // pub OP_STR,    /* store register */
-    // pub OP_RTI,    /* unused */
-    // pub OP_NOT,    /* bitwise not */
+    pub const OP_LDR: usize = 6;    /* load register */
+    pub const OP_STR: usize = 7;    /* store register */
+    pub const OP_RTI: usize = 8;    /* unused */
+    pub const OP_NOT: usize = 9;    /* bitwise not */
     pub const OP_LDI: usize = 10;    /* load indirect */
-    // pub OP_STI,    /* store indirect */
-    // pub OP_JMP,    /* jump */
-    // pub OP_RES,    /* reserved (unused) */
-    // pub OP_LEA,    /* load effective address */
+    pub const OP_STI: usize = 11;    /* store indirect */
+    pub const OP_JMP: usize = 12;    /* jump */
+    pub const OP_RES: usize = 13;    /* reserved (unused) */
+    pub const OP_LEA: usize = 14;    /* load effective address */
     pub const OP_TRAP: usize = 15;    /* execute trap */
 
 
@@ -50,5 +50,6 @@ pub mod constants {
     pub const TRAP_IN: usize = 0x23;    /* get character from keyboard, echoed onto the terminal */
     pub const TRAP_PUTSP: usize = 0x24; /* output a byte string */
     pub const TRAP_HALT: usize = 0x25;   /* halt the program */
+    
 
 }

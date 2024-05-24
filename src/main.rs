@@ -16,7 +16,7 @@ fn trap_handler(instr: usize, reg: &mut [usize; R_COUNT]) {
 
 
 fn start_vm() {   
-    let memory: [usize; MEMORY_MAX] = [0; MEMORY_MAX];
+    let mut memory: [usize; MEMORY_MAX] = [0; MEMORY_MAX];
 
     let mut reg: [usize; R_COUNT] = [0; R_COUNT];
 
@@ -36,8 +36,18 @@ fn start_vm() {
 
         match op {
             OP_ADD => add(instr, &mut reg),
-            //OP_LDI => ldi(instr, reg, memory),
+            OP_LDI => ldi(instr, &mut reg, &memory),
             OP_AND => and(instr, &mut reg),
+            OP_LD => ld(instr, &mut reg, &memory),
+            OP_ST => store(instr, &mut reg, &mut memory),
+            OP_JSR => jump_register(instr, &mut reg),
+            OP_LDR => ldr(instr, &mut reg, &mut memory),
+            OP_STR => store_register(instr, &mut reg, &mut memory),
+            OP_NOT => not(instr, &mut reg),
+            OP_STI => store_indirect(instr, &mut reg, &mut memory),
+            OP_JMP => jump(instr, &mut reg),
+            OP_LEA => lea(instr, &mut reg),
+            OP_BR => branch(instr, &mut reg),
             OP_TRAP => trap_handler(instr, &mut reg),
             _ => println!("not implemented yet"),
         }
