@@ -1,10 +1,14 @@
 pub mod utils {
-    use std::{fs::File, io::Read};
+    extern crate byteorder;
+    use std::{fs::File, io::Read, io::BufReader};
+    use byteorder::{BigEndian, ReadBytesExt};
+    
 
     use crate::constants::constants::*;
     pub fn sign_extend(mut x: usize, bit_count: usize) -> usize {
         if (x >> (bit_count - 1)) & 1 == 1 {
-            x |= 0xFFFF << bit_count;
+            //x |= 0xFFFF << bit_count;
+            x |= 0xFF << bit_count;
         }
         x
     }
@@ -27,20 +31,21 @@ pub mod utils {
     }
 
     pub fn read_image_file(file: &mut File, memory: &mut [usize; MEMORY_MAX]) {
-        
-        let mut arr: [u8; 2] = [0; 2];
-        let _read_bytes = file.read(&mut arr).unwrap();
-        let origin: u16 = arr[0] as u16| (arr[1] as u16) << 8;
-        //let max_read = MEMORY_MAX - origin as usize;
-        //let address = origin;
-        let mut bytes:[u8; MEMORY_MAX * 2] = [0; MEMORY_MAX * 2];
-        let _read = file.read(&mut bytes).expect("error while reading file");
-        
-
-        let mut j = 0;
-        for i in (0..bytes.len()).step_by(2) {
-            memory[(origin + j) as usize] = bytes[i] as usize | ((bytes[i+1] as usize) << 8);
-            j += 1;
+        let mut rdr = BufReader::new(file);
+            
+        let base_address = rdr.read_u16::<BigEndian>().expect("error while reading base_address");
+        let mut address = base_address as usize;
+        loop {
+            match rdr.read_u16::<BigEndian>() {
+                Ok(instruction) => {
+                    println!("instruction = {:X}", instruction);
+                    memory[address] = instruction as usize;
+                    address += 1;
+                }
+                Err(_e) => {
+                    return;
+                }
+            }
         }
     }
 

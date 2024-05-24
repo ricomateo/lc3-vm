@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 console = "0.15"
+byteorder = "1.2.7"
