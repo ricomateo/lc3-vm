@@ -7,10 +7,10 @@ pub mod utils {
     use crate::constants::constants::*;
     pub fn sign_extend(mut x: usize, bit_count: usize) -> usize {
         if (x >> (bit_count - 1)) & 1 == 1 {
-            //x |= 0xFFFF << bit_count;
-            x |= 0xFF << bit_count;
+            x |= 0xFFFF << bit_count;
+            //x |= 0xFF << bit_count;
         }
-        x
+        x as u16 as usize
     }
     
     pub fn update_flags(r: usize, reg: &mut [usize; R_COUNT]) {
