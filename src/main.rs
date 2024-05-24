@@ -10,7 +10,7 @@ pub mod constants;
 pub mod utils;
 pub mod traps;
 
-fn trap_handler(instr: usize, mut reg: &mut [usize; R_COUNT], mut memory: &mut [usize; MEMORY_MAX], mut running: &mut usize) {
+fn trap_handler(instr: u16, mut reg: &mut [u16; R_COUNT], mut memory: &mut [u16; MEMORY_MAX], mut running: &mut usize) {
     println!("trap_handler");
     reg[R_R7] = reg[R_PC];
     match instr & 0xFF {
@@ -26,9 +26,9 @@ fn trap_handler(instr: usize, mut reg: &mut [usize; R_COUNT], mut memory: &mut [
 
 
 fn start_vm() {   
-    let mut memory: [usize; MEMORY_MAX] = [0; MEMORY_MAX];
+    let mut memory: [u16; MEMORY_MAX] = [0; MEMORY_MAX];
 
-    let mut reg: [usize; R_COUNT] = [0; R_COUNT];
+    let mut reg: [u16; R_COUNT] = [0; R_COUNT];
 
     /* since exactly one condition flag should be set at any given time, set the Z flag */
     reg[R_COND] = FL_ZRO;
@@ -46,8 +46,8 @@ fn start_vm() {
     while running == 1 {
         /* FETCH */
         reg[R_PC] += 1;
-        let instr: usize = memory[(reg[R_PC] as u16) as usize];
-        let op: usize = instr >> 12;
+        let instr: u16 = memory[reg[R_PC] as usize];
+        let op: u16 = instr >> 12;
         match op {
             OP_ADD => add(instr, &mut reg),
             OP_LDI => ldi(instr, &mut reg, &memory),
