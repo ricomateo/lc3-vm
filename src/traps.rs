@@ -72,6 +72,12 @@ pub mod traps {
         }
         chars
     }
+
+
+    pub fn halt(running: &mut usize) {
+        println!("HALT");
+        *running = 0;
+    }
 }
 
 
