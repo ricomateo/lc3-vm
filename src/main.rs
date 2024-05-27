@@ -1,7 +1,7 @@
 
 
 use utils::read_image;
-
+use std::env;
 use crate::instructions::*;
 use crate::constants::*;
 use crate::traps::*;
@@ -25,14 +25,14 @@ fn trap_handler(instr: u16, mut reg: &mut [u16; R_COUNT], mut memory: &mut [u16;
 }
 
 
-fn start_vm() {   
+fn start_vm(image_path: String) {   
     let mut memory: [u16; MEMORY_MAX] = [0; MEMORY_MAX];
 
     let mut reg: [u16; R_COUNT] = [0; R_COUNT];
 
     /* since exactly one condition flag should be set at any given time, set the Z flag */
     reg[R_COND] = FL_ZRO;
-    read_image("../2048.obj", &mut memory).expect("error while reading obj file");
+    read_image(&image_path, &mut memory).expect("error while reading obj file");
     /* set the PC to starting position */
     /* 0x3000 is the default */
     let pc_start = 0x3000;
@@ -69,5 +69,11 @@ fn start_vm() {
 }
 
 fn main() {
-    start_vm();
+    let args: Vec<_> = env::args().collect();
+    if args.len() < 2 {
+        panic!("File argument is missing");
+    }
+    let filename: String = args[1].clone();
+    let image_path = "../".to_string() + &filename;
+    start_vm(image_path);
 }
