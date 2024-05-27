@@ -23,14 +23,15 @@ pub fn add(instr: u16, mut reg: &mut [u16; R_COUNT]) {
     update_flags(r0, &mut reg);
 }
 
-pub fn ldi(instr: u16, mut reg: &mut [u16; R_COUNT], memory: &[u16; MEMORY_MAX]) {
+pub fn ldi(instr: u16, mut reg: &mut [u16; R_COUNT], mut memory: &mut [u16; MEMORY_MAX]) {
     //println!("ldi");
     /* destination register (DR) */
     let r0: u16 = (instr >> 9) & 0x7;
     /* PCoffset 9*/
     let pc_offset: u16 = sign_extend(instr & 0x1FF, 9);
     /* add pc_offset to the current PC, look at that memory location to get the final address */
-    reg[r0 as usize] = memory[memory[(reg[R_PC] + pc_offset) as usize] as usize];
+    let address = memory_read(&mut memory, reg[R_PC] + pc_offset);
+    reg[r0 as usize] = memory_read(&mut memory, address);
     update_flags(r0, &mut reg);
 }
 
@@ -93,22 +94,23 @@ pub fn jump_register(instr: u16, reg: &mut [u16; R_COUNT]) {
 
 /// Loads onto a register the value contained in the address
 /// PC + PCoffset9
-pub fn ld(instr: u16, reg: &mut [u16; R_COUNT], memory: &[u16; MEMORY_MAX]) {
+pub fn ld(instr: u16, reg: &mut [u16; R_COUNT], mut memory: &mut [u16; MEMORY_MAX]) {
     //println!("ld");
     let r0: u16 = (instr >> 9) & 0x7;
     let pc_offset: u16 = sign_extend(instr & 0x1FF, 9);
-    reg[r0 as usize] = memory[reg[R_PC] as usize + pc_offset as usize];
+    reg[r0 as usize] = memory_read(&mut memory, reg[R_PC] + pc_offset);
     update_flags(r0, reg);
 }
 
 /// Computes an address by calculating address = base register + offset6
 /// and then loads the value contained in that address into a register
-pub fn ldr(instr: u16, reg: &mut [u16; R_COUNT], memory: &[u16; MEMORY_MAX]) {
+pub fn ldr(instr: u16, reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX]) {
     //println!("ldr");
     let r0: u16 = (instr >> 9) & 0x7;
     let r1: u16 = (instr >> 6) & 0x7;
     let offset: u16 = sign_extend(instr & 0x3F, 6);
-    reg[r0 as usize] = memory[(reg[r1 as usize] + offset) as usize];
+    
+    reg[r0 as usize] = memory_read(memory, reg[r1 as usize] + offset);
     update_flags(r0, reg);
 }
 
@@ -138,7 +140,8 @@ pub fn store_indirect(instr: u16, reg: &mut [u16; R_COUNT], memory: &mut [u16; M
     //println!("store indirect");
     let r0: u16 = (instr >> 9) & 0x7;
     let pc_offset: u16 = sign_extend(instr & 0x1FF, 9);
-    memory[memory[(reg[R_PC] + pc_offset) as usize] as usize] = reg[r0 as usize];
+    let address = memory_read(memory, reg[R_PC] + pc_offset);
+    memory[address as usize] = reg[r0 as usize];
 }
 
 /// Computes a memory address by adding base register + offset 6.
@@ -195,7 +198,7 @@ mod tests {
         // memory[2] holds the value 64
         memory[2] = 64;
         assert_eq!(reg[R_R1], 0);
-        ldi(instr, &mut reg, &memory);
+        ldi(instr, &mut reg, &mut memory);
         assert_eq!(reg[R_R1], 64);
     }
 

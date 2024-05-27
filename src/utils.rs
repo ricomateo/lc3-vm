@@ -2,6 +2,7 @@
 extern crate byteorder;
 use std::{fs::File, io::BufReader};
 use byteorder::{BigEndian, ReadBytesExt};
+use std::io::Read;
 
 
 use crate::constants::*;
@@ -58,3 +59,20 @@ pub fn read_image(image_path: &str, memory: &mut [u16; MEMORY_MAX]) -> Result<()
     Ok(())
 }
 
+pub fn memory_read(memory: &mut [u16; MEMORY_MAX], address: u16) -> u16{
+    if address == MR_KBSR as u16 {
+        handle_keyboard(memory);
+    }
+    memory[address as usize]
+}
+
+fn handle_keyboard(memory: &mut [u16; MEMORY_MAX]) {
+    let mut buffer = [0; 1];
+    std::io::stdin().read_exact(&mut buffer).unwrap();
+    if buffer[0] != 0 {
+        memory[MR_KBSR as usize] =  1 << 15;
+        memory[MR_KBDR as usize] = buffer[0] as u16;
+    } else {
+        memory[MR_KBSR as usize] = 0;
+    }
+}

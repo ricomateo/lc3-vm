@@ -11,7 +11,7 @@ pub mod utils;
 pub mod traps;
 
 fn trap_handler(instr: u16, mut reg: &mut [u16; R_COUNT], mut memory: &mut [u16; MEMORY_MAX], mut running: &mut usize) {
-    println!("trap_handler");
+    //println!("trap_handler");
     reg[R_R7] = reg[R_PC];
     match instr & 0xFF {
         TRAP_GETC => getc(&mut reg),
@@ -20,7 +20,7 @@ fn trap_handler(instr: u16, mut reg: &mut [u16; R_COUNT], mut memory: &mut [u16;
         TRAP_PUTS => puts(&mut reg, &mut memory),
         TRAP_PUTSP => putsp(&mut reg, &mut memory),
         TRAP_HALT => halt(&mut running),
-        _ => println!("trap {:X} not implemented yet", instr & 0xFF),
+        _ => panic!("invalid trap code!")
     }
 }
 
@@ -50,9 +50,9 @@ fn start_vm() {
         _i+=1;
         match op {
             OP_ADD => add(instr, &mut reg),
-            OP_LDI => ldi(instr, &mut reg, &memory),
+            OP_LDI => ldi(instr, &mut reg, &mut memory),
             OP_AND => and(instr, &mut reg),
-            OP_LD => ld(instr, &mut reg, &memory),
+            OP_LD => ld(instr, &mut reg, &mut memory),
             OP_ST => store(instr, &mut reg, &mut memory),
             OP_JSR => jump_register(instr, &mut reg),
             OP_LDR => ldr(instr, &mut reg, &mut memory),
@@ -65,9 +65,6 @@ fn start_vm() {
             OP_TRAP => trap_handler(instr, &mut reg, &mut memory, &mut running),
             _ => println!("not implemented yet"),
         }
-        // if reg[R_PC] == MEMORY_MAX - 1 {
-        //     reg[R_PC] = 0;
-        // }
     }
 }
 
