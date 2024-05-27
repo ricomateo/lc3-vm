@@ -1,16 +1,19 @@
-
-
-use utils::read_image;
-use std::env;
-use crate::instructions::*;
 use crate::constants::*;
+use crate::instructions::*;
 use crate::traps::*;
-pub mod instructions;
+use std::env;
+use utils::read_image;
 pub mod constants;
-pub mod utils;
+pub mod instructions;
 pub mod traps;
+pub mod utils;
 
-fn trap_handler(instr: u16, mut reg: &mut [u16; R_COUNT], mut memory: &mut [u16; MEMORY_MAX], mut running: &mut usize) {
+fn trap_handler(
+    instr: u16,
+    mut reg: &mut [u16; R_COUNT],
+    mut memory: &mut [u16; MEMORY_MAX],
+    mut running: &mut usize,
+) {
     //println!("trap_handler");
     reg[R_R7] = reg[R_PC];
     match instr & 0xFF {
@@ -20,12 +23,11 @@ fn trap_handler(instr: u16, mut reg: &mut [u16; R_COUNT], mut memory: &mut [u16;
         TRAP_PUTS => puts(&mut reg, &mut memory),
         TRAP_PUTSP => putsp(&mut reg, &mut memory),
         TRAP_HALT => halt(&mut running),
-        _ => panic!("invalid trap code!")
+        _ => panic!("invalid trap code!"),
     }
 }
 
-
-fn start_vm(image_path: String) {   
+fn start_vm(image_path: String) {
     let mut memory: [u16; MEMORY_MAX] = [0; MEMORY_MAX];
 
     let mut reg: [u16; R_COUNT] = [0; R_COUNT];
@@ -38,7 +40,6 @@ fn start_vm(image_path: String) {
     let pc_start = 0x3000;
     reg[R_PC] = pc_start;
 
-
     let mut running = 1;
     let mut _i = 0;
     while running == 1 {
@@ -47,7 +48,7 @@ fn start_vm(image_path: String) {
         let instr: u16 = memory[reg[R_PC] as usize];
         let op: u16 = instr >> 12;
         reg[R_PC] += 1;
-        _i+=1;
+        _i += 1;
         match op {
             OP_ADD => add(instr, &mut reg),
             OP_LDI => ldi(instr, &mut reg, &mut memory),

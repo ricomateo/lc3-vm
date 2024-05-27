@@ -1,9 +1,7 @@
-
 extern crate byteorder;
-use std::{fs::File, io::BufReader};
 use byteorder::{BigEndian, ReadBytesExt};
 use std::io::Read;
-
+use std::{fs::File, io::BufReader};
 
 use crate::constants::*;
 pub fn sign_extend(mut x: u16, bit_count: u16) -> u16 {
@@ -17,7 +15,9 @@ pub fn sign_extend(mut x: u16, bit_count: u16) -> u16 {
 pub fn update_flags(r: u16, reg: &mut [u16; R_COUNT]) {
     if reg[r as usize] == 0 {
         reg[R_COND] = FL_ZRO;
-    } else if reg[r as usize] >> 15 == 1 /* a 1 in the left-most bit indicates negative */{
+    } else if reg[r as usize] >> 15 == 1
+    /* a 1 in the left-most bit indicates negative */
+    {
         reg[R_COND] = FL_NEG;
     } else {
         reg[R_COND] = FL_POS;
@@ -33,8 +33,10 @@ pub fn get_char() -> char {
 
 pub fn read_image_file(file: &mut File, memory: &mut [u16; MEMORY_MAX]) {
     let mut rdr = BufReader::new(file);
-        
-    let base_address = rdr.read_u16::<BigEndian>().expect("error while reading base_address");
+
+    let base_address = rdr
+        .read_u16::<BigEndian>()
+        .expect("error while reading base_address");
     let mut address = base_address as u16;
     loop {
         match rdr.read_u16::<BigEndian>() {
@@ -50,7 +52,7 @@ pub fn read_image_file(file: &mut File, memory: &mut [u16; MEMORY_MAX]) {
     }
 }
 
-pub fn read_image(image_path: &str, memory: &mut [u16; MEMORY_MAX]) -> Result<(), std::io::Error>{
+pub fn read_image(image_path: &str, memory: &mut [u16; MEMORY_MAX]) -> Result<(), std::io::Error> {
     let file = File::open(image_path);
     match file {
         Err(e) => return Err(e),
@@ -59,7 +61,7 @@ pub fn read_image(image_path: &str, memory: &mut [u16; MEMORY_MAX]) -> Result<()
     Ok(())
 }
 
-pub fn memory_read(memory: &mut [u16; MEMORY_MAX], address: u16) -> u16{
+pub fn memory_read(memory: &mut [u16; MEMORY_MAX], address: u16) -> u16 {
     if address == MR_KBSR as u16 {
         handle_keyboard(memory);
     }
@@ -70,7 +72,7 @@ fn handle_keyboard(memory: &mut [u16; MEMORY_MAX]) {
     let mut buffer = [0; 1];
     std::io::stdin().read_exact(&mut buffer).unwrap();
     if buffer[0] != 0 {
-        memory[MR_KBSR as usize] =  1 << 15;
+        memory[MR_KBSR as usize] = 1 << 15;
         memory[MR_KBDR as usize] = buffer[0] as u16;
     } else {
         memory[MR_KBSR as usize] = 0;

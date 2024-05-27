@@ -1,5 +1,3 @@
-
-
 use crate::constants::*;
 use crate::utils::*;
 
@@ -43,7 +41,7 @@ pub fn and(instr: u16, mut reg: &mut [u16; R_COUNT]) {
 
     if imm_flag == 1 {
         let imm5: u16 = sign_extend(instr & 0x1F, 5);
-        reg[r0  as usize] = reg[r1 as usize] & imm5;
+        reg[r0 as usize] = reg[r1 as usize] & imm5;
     } else {
         let r2: u16 = instr & 0x7;
         reg[r0 as usize] = reg[r1 as usize] & reg[r2 as usize];
@@ -61,10 +59,9 @@ pub fn not(instr: u16, mut reg: &mut [u16; R_COUNT]) {
 }
 
 pub fn branch(instr: u16, reg: &mut [u16; R_COUNT]) {
-    
     let pc_offset: u16 = sign_extend(instr & 0x1FF, 9) as u16 as u16;
     let cond_flag: u16 = (instr >> 9) & 0x7;
-    
+
     if cond_flag & reg[R_COND] > 0 {
         reg[R_PC] += pc_offset;
     }
@@ -85,7 +82,7 @@ pub fn jump_register(instr: u16, reg: &mut [u16; R_COUNT]) {
     reg[R_R7] = reg[R_PC];
     if long_flag > 0 {
         let long_pc_offset: u16 = sign_extend(instr & 0x7FF, 11);
-        reg[R_PC] += long_pc_offset;  /* JSR */
+        reg[R_PC] += long_pc_offset; /* JSR */
     } else {
         let r1: u16 = (instr >> 6) & 0x7;
         reg[R_PC] = reg[r1 as usize]; /* JSRR */
@@ -109,7 +106,7 @@ pub fn ldr(instr: u16, reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX])
     let r0: u16 = (instr >> 9) & 0x7;
     let r1: u16 = (instr >> 6) & 0x7;
     let offset: u16 = sign_extend(instr & 0x3F, 6);
-    
+
     reg[r0 as usize] = memory_read(memory, reg[r1 as usize] + offset);
     update_flags(r0, reg);
 }
@@ -124,7 +121,7 @@ pub fn lea(instr: u16, reg: &mut [u16; R_COUNT]) {
     update_flags(r0, reg);
 }
 
-/// Computes a memory address by adding PC and PCoffset9, and then 
+/// Computes a memory address by adding PC and PCoffset9, and then
 /// stores the value contained in a register in that memory address
 pub fn store(instr: u16, reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX]) {
     //println!("store");
@@ -153,20 +150,15 @@ pub fn store_register(instr: u16, reg: &mut [u16; R_COUNT], memory: &mut [u16; M
     let offset: u16 = sign_extend(instr & 0x3F, 6) as u16 as u16;
     //println!("reg[r1] = {:X}", reg[r1 as usize]);
     //println!("offset = {:X}", offset);
-    
+
     memory[(reg[r1 as usize] + offset) as usize] = reg[r0 as usize];
 }
 
-
-
-
-
-
 #[cfg(test)]
 mod tests {
-    use crate::constants::*;
     use super::*;
-    
+    use crate::constants::*;
+
     #[test]
     /// This test sets r1 = 2, r2 = 2 and then
     /// executes r3 = r1 + r2
@@ -227,7 +219,7 @@ mod tests {
         assert_eq!(reg[R_R2], 0);
         not(instr, &mut reg);
         // the &0xffff is needed because reg contains u16, not u16
-        assert_eq!(reg[R_R2] &0xffff, 65535);
+        assert_eq!(reg[R_R2] & 0xffff, 65535);
     }
 
     #[test]
@@ -255,9 +247,8 @@ mod tests {
         assert_eq!(reg[R_PC], 16);
     }
 
-
     #[test]
-    /// The pc register starts on 8. 
+    /// The pc register starts on 8.
     /// After the execution of jump_register it should be incremented
     /// by 4 so pc = 12 and the previous value should have been saved
     /// on register r7, so r7 = 8.
@@ -321,7 +312,6 @@ mod tests {
         assert_eq!(reg[R_R1], 4);
     }
 
-
     #[test]
     /// Stores the value contained by r1 (16) in the
     /// address given by pc + pc_offset = 4
@@ -356,7 +346,6 @@ mod tests {
         assert_eq!(memory[address as usize], reg[R_R1]);
     }
 
-
     #[test]
     /// stores the value specified by the register r1 (16) in the
     /// address r2 + offset = 4 + 4 = 8
@@ -374,9 +363,3 @@ mod tests {
         assert_eq!(memory[(reg[R_R2] + offset) as usize], value);
     }
 }
-
-
-
-
-
-

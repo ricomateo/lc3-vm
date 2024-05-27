@@ -1,8 +1,8 @@
-
 use crate::constants::*;
 use crate::utils::*;
 
-pub fn puts(reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX]) { //-> Vec<char> {
+pub fn puts(reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX]) {
+    //-> Vec<char> {
     let mut address = reg[R_R0];
     let mut c: u16 = memory[address as usize] as u16;
     let mut chars: Vec<char> = Vec::new();
@@ -43,10 +43,11 @@ pub fn input_character(reg: &mut [u16; R_COUNT]) {
     update_flags(R_R0 as u16, reg);
 }
 
-pub fn putsp(reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX]) {//-> Vec<char> {
+pub fn putsp(reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX]) {
+    //-> Vec<char> {
     /* one char per byte (two bytes per word)
-        here we need to swap back to
-        big endian format */
+    here we need to swap back to
+    big endian format */
     let mut address = reg[R_R0];
     let mut c: u16 = memory[address as usize];
     let mut chars: Vec<char> = Vec::new();
@@ -62,7 +63,7 @@ pub fn putsp(reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX]) {//-> Vec
         let char2: u16 = (c) >> 8;
         if char2 as u8 != 0 {
             let char2 = char::from_u32(char2 as u32).expect("error while converting char");
-            print!("{}",char2);
+            print!("{}", char2);
             chars.push(char2);
             address += 1;
             c = memory[address as usize];
@@ -73,19 +74,15 @@ pub fn putsp(reg: &mut [u16; R_COUNT], memory: &mut [u16; MEMORY_MAX]) {//-> Vec
     //chars
 }
 
-
 pub fn halt(running: &mut usize) {
     println!("HALT");
     *running = 0;
 }
 
-
-
-
 #[cfg(test)]
 mod tests {
-    use crate::constants::*;
     use super::*;
+    use crate::constants::*;
     #[test]
     /// This test sets r1 = 2, r2 = 2 and then
     /// executes r3 = r1 + r2
@@ -112,7 +109,6 @@ mod tests {
         assert_ne!(reg[R_R0], 0);
     }
 
-
     #[test]
     fn putsp_works_correctly() {
         let chars = vec!['h', 'e', 'l', 'l', 'o'];
@@ -120,7 +116,7 @@ mod tests {
         let mut memory: [u16; MEMORY_MAX] = [0; MEMORY_MAX];
 
         let mut j = 0;
-        
+
         // set a character in each of the two bytes of memory, for each address
         // for example
         // 0:  'e'  'h'
