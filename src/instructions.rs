@@ -59,7 +59,7 @@ pub fn not(instr: u16, mut reg: &mut [u16; R_COUNT]) {
     update_flags(r0, &mut reg);
 }
 
-pub fn branch(instr: u16, mut reg: &mut [u16; R_COUNT]) {
+pub fn branch(instr: u16, reg: &mut [u16; R_COUNT]) {
     
     let pc_offset: u16 = sign_extend(instr & 0x1FF, 9) as u16 as u16;
     let cond_flag: u16 = (instr >> 9) & 0x7;
@@ -69,7 +69,7 @@ pub fn branch(instr: u16, mut reg: &mut [u16; R_COUNT]) {
     }
 }
 
-pub fn jump(instr: u16, mut reg: &mut [u16; R_COUNT]) {
+pub fn jump(instr: u16, reg: &mut [u16; R_COUNT]) {
     // println!("jump");
     let r1: u16 = (instr >> 6) & 0x7;
     reg[R_PC] = reg[r1 as usize];
@@ -150,7 +150,6 @@ pub fn store_register(instr: u16, reg: &mut [u16; R_COUNT], memory: &mut [u16; M
     let offset: u16 = sign_extend(instr & 0x3F, 6) as u16 as u16;
     //println!("reg[r1] = {:X}", reg[r1 as usize]);
     //println!("offset = {:X}", offset);
-    let index = reg[r1 as usize] + offset;
     
     memory[(reg[r1 as usize] + offset) as usize] = reg[r0 as usize];
 }

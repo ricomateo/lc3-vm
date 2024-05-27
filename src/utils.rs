@@ -1,6 +1,6 @@
 
 extern crate byteorder;
-use std::{fs::File, io::Read, io::BufReader};
+use std::{fs::File, io::BufReader};
 use byteorder::{BigEndian, ReadBytesExt};
 
 

@@ -1,4 +1,4 @@
-use std::mem;
+
 
 use utils::read_image;
 
@@ -38,19 +38,16 @@ fn start_vm() {
     let pc_start = 0x3000;
     reg[R_PC] = pc_start;
 
-    for i in 0..memory.len() {
-        //println!("memory[{i}] = {}", memory[i]);
-    }
 
     let mut running = 1;
-    let mut i = 0;
+    let mut _i = 0;
     while running == 1 {
         /* FETCH */
         //reg[R_PC] += 1;
         let instr: u16 = memory[reg[R_PC] as usize];
         let op: u16 = instr >> 12;
         reg[R_PC] += 1;
-        i+=1;
+        _i+=1;
         match op {
             OP_ADD => add(instr, &mut reg),
             OP_LDI => ldi(instr, &mut reg, &memory),
