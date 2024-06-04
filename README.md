@@ -7,8 +7,8 @@ This project has been developed based on the following guides
 
 
 ## Run an LC-3 program
-Programs can be run executing `cargo run <program_name>.obj`.
-This repo contains some games to try. These can be run with
+Programs can be executed with `cargo run <program_name>.obj`.
+This repo contains some games to try. These can be executed with (make sure you are on the `src` directory)
 * `cargo run 2048.obj` (You should press enter after the first line is printed)
 * `cargo run rogue.obj`
 
